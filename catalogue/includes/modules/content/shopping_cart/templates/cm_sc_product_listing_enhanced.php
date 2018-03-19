@@ -1,0 +1,108 @@
+<?php
+/*
+  $Id$
+  $Loc: catalog/includes/modules/content/shopping_cart/templates/
+ 
+  osCommerce, Open Source E-Commerce Solutions
+  http://www.oscommerce.com
+ 
+  Copyright (c) 2016 osCommerce
+ 
+  Released under the GNU General Public License
+*/
+?>
+
+<div id="cm_sc_product_listing_enhanced" class="col-sm-<?php echo (int)MODULE_CONTENT_SHOPPING_CART_PRODUCT_ENHANCED_LISTING_CONTENT_WIDTH ?>">
+	<?php echo tep_draw_form( 'cart_quantity', tep_href_link( FILENAME_SHOPPING_CART, 'action=update_product' ) ); ?>
+    <table class="table table-striped table-condensed">
+        
+      <!-- Start heading -->
+      <thead>
+        <tr>
+          <!-- Image heading -->
+          <th>
+            <?php echo MODULE_CONTENT_SHOPPING_CART_PRODUCT_ENHANCED_LISTING_HEADING_IMAGE; ?>
+          </th>
+          <!-- Product name heading -->
+          <th>
+            <?php echo MODULE_CONTENT_SHOPPING_CART_PRODUCT_ENHANCED_LISTING_HEADING_NAME; ?>
+          </th>
+          <!-- Quantity heading -->
+          <th>
+            <?php echo MODULE_CONTENT_SHOPPING_CART_PRODUCT_ENHANCED_LISTING_HEADING_QUANTITY; ?>
+          </th>
+          <!-- Unit cost heading -->
+          <th class="text-right">
+            <?php echo MODULE_CONTENT_SHOPPING_CART_PRODUCT_ENHANCED_LISTING_HEADING_UNIT_COST; ?>
+          </th>
+          <!-- Total cost heading -->
+          <th class="text-right">
+            <?php echo MODULE_CONTENT_SHOPPING_CART_PRODUCT_ENHANCED_LISTING_HEADING_TOTAL_COST; ?>
+          </th>
+        </tr>
+      </thead>
+      <!-- End heading -->
+        
+      <!-- Start body -->
+      <tbody>
+      	<?php       
+          foreach( $cart->get_products() as $product ) {
+        ?>
+        <tr>
+          <!-- Image -->
+          <td>
+		  <div style="float:left; padding-right: .5em;">
+             <a href="<?php echo tep_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $product['id']); ?>"><?php echo tep_image(DIR_WS_PRODUCT_IMAGES . substr($product['image'],2), $product['name'], 100, 100); ?></a>
+          </div>
+		  </td>
+          <!-- Name -->
+          <td>
+		  <div style="float:left; padding-right: .5em;">
+            <a href="<?php echo tep_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $product['id']); ?>"><strong><?php echo $product['name']; ?></strong></a>
+          </div>
+		  <!-- Out of Stock warning -->
+            <?php
+		if( ($product['products_special_order_item'] != 2) && $this->is_out_of_stock( (int)$product['id'], $product['quantity'] )) {
+                $any_out_of_stock = 1;
+                echo $this->stock_check( $product['id'], $product['quantity'] );  
+              }
+            ?>
+            <!-- List attributes -->
+            <?php
+              if ( $this->has_product_attributes( $product ) === true ) {
+                foreach( $this->get_product_attributes( $product ) as $options ) {
+              ?>
+        		  <br /><small><i> - <?php echo $options['products_options_name']; ?> <?php echo $options['products_options_values_name']; ?></i></small>
+	  				  <?php echo tep_draw_hidden_field('id[' . $product['id'] . '][' . $options['options_id'] . ']', $options['options_values_id']); ?>
+              <?php
+                }
+              }  
+            ?>
+          </td>
+          <!-- Quantity -->
+          <td style="">
+            <div style="float:left; padding-right: .5em;">
+              <?php echo tep_draw_input_field('cart_quantity[]', $product['quantity'], 'style="width: 65px;" min="0"', 'number'); ?>
+            </div>
+            <?php echo tep_draw_hidden_field('products_id[]', $product['id']); ?>
+            <div style="float:left; display: inline-block; inline-box-align: initial; vertical-align: middle;">
+              <?php echo tep_draw_button(NULL, 'fa fa-refresh', NULL, NULL, NULL, 'btn-info btn-xs'); ?>
+              <?php echo tep_draw_button(NULL, 'fa fa-remove', tep_href_link(FILENAME_SHOPPING_CART, 'products_id=' . $product['id'] . '&action=remove_product'), NULL, NULL, 'btn-danger btn-xs');  ?>
+            </div>
+				  </td>
+          <!-- Unit price -->
+          <td class="text-right">
+            <?php echo $currencies->display_price($product['final_price'], tep_get_tax_rate($product['tax_class_id']), 1) . MODULE_CONTENT_SHOPPING_CART_PRODUCT_ENHANCED_LISTING_TEXT_EACH; ?>
+          </td>
+          <!-- Total price -->
+      	  <td class="text-right">
+            <strong><?php echo $currencies->display_price($product['final_price'], tep_get_tax_rate($product['tax_class_id']), $product['quantity']); ?></strong>
+          </td>
+        </tr>
+        <?php
+        }
+        ?>
+	    </tbody>
+	  </table>
+	</form>
+</div>	
