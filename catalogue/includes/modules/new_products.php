@@ -1,0 +1,87 @@
+<?php
+/*
+  Copyright (c) 2014, G Burton www.clubosc.com
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+  1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+  2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+  3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+  define('DEFAULT_IMAGE', '/skus/image-not-available.jpg');
+  
+  // register hook and call css
+  $OSCOM_Hooks->register('product');
+  echo $OSCOM_Hooks->call('product', 'corner_ribbons_css');
+
+  if ( (!isset($new_products_category_id)) || ($new_products_category_id == '0') ) {
+    $new_products_query_raw = "select p.products_id, p.products_image, p.products_weight, p.products_tax_class_id, pd.products_name, if(s.status, s.specials_new_products_price, p.products_price) as products_price from " . TABLE_PRODUCTS . " p left join " . TABLE_SPECIALS . " s on p.products_id = s.products_id, " . TABLE_PRODUCTS_DESCRIPTION . " pd where p.products_status = '1' and p.products_id = pd.products_id and pd.language_id = '" . (int)$languages_id . "' AND (p.products_category = '" . STORE_CATEGORY . "' OR p.products_category = '" . STORE_CATEGORY2 . "' OR p.products_category = '" . STORE_CATEGORY3 . "' OR p.products_category = '" . STORE_CATEGORY4 . "' OR p.products_category = '" . STORE_CATEGORY5 . "') AND (p.products_site = 'ALL' OR p.products_site = 'CAD') order by p.products_date_added desc";
+  } else {
+    $new_products_query_raw = "select distinct p.products_id, p.products_image, p.products_weight, p.products_tax_class_id, pd.products_name, if(s.status, s.specials_new_products_price, p.products_price) as products_price from " . TABLE_PRODUCTS . " p left join " . TABLE_SPECIALS . " s on p.products_id = s.products_id, " . TABLE_PRODUCTS_DESCRIPTION . " pd, " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c, " . TABLE_CATEGORIES . " c where p.products_id = p2c.products_id and p2c.categories_id = c.categories_id and c.parent_id = '" . (int)$new_products_category_id . "' and p.products_status = '1' and p.products_id = pd.products_id and pd.language_id = '" . (int)$languages_id . "' AND (p.products_category = '" . STORE_CATEGORY . "' OR p.products_category = '" . STORE_CATEGORY2 . "' OR p.products_category = '" . STORE_CATEGORY3 . "' OR p.products_category = '" . STORE_CATEGORY4 . "' OR p.products_category = '" . STORE_CATEGORY5 . "') AND (p.products_site = 'ALL' OR p.products_site = 'CAD') order by p.products_date_added desc";
+  }
+  
+  $listing_split = new splitPageResults($new_products_query_raw, MAX_DISPLAY_NEW_PRODUCTS, 'p.products_id');
+  
+  if ($listing_split->number_of_rows > 0) {
+
+    $new_products_query = tep_db_query($listing_split->sql_query);
+
+    $new_prods_content = NULL;
+
+    while ($new_products = tep_db_fetch_array($new_products_query)) {
+	  $new_prods_content .= '<div class="col-sm-6 col-md-4">';
+	  $new_prods_content .=  $OSCOM_Hooks->call('product', 'corner_ribbons');	
+      $new_prods_content .= '  <div class="thumbnail equal-height">';
+     if  ( isset ($new_products['products_image']) && ($new_products['products_image'] != 'NULL') ){	
+	  $new_prods_content .= '    <a href="' . tep_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $new_products['products_id']) . '">' . tep_image(DIR_WS_PRODUCT_IMAGES . substr($new_products['products_image'],2), $new_products['products_name'], SMALL_IMAGE_WIDTH, SMALL_IMAGE_HEIGHT) . '</a>';
+	 }else {
+	  $new_prods_content .= '    <a href="' . tep_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $new_products['products_id']) . '">' . tep_image(DIR_WS_IMAGES . DEFAULT_IMAGE, $new_products['products_name'], SMALL_IMAGE_WIDTH, SMALL_IMAGE_HEIGHT) . '</a>';
+	 }         
+	  $new_prods_content .= '    <div class="caption">';
+      $new_prods_content .= '      <p class="text-center"><a href="' . tep_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $new_products['products_id']) . '">' . $new_products['products_name'] . '</a></p>';
+      $new_prods_content .= '      <hr>';
+      $new_prods_content .= '      <p class="text-center">' . $currencies->display_price($new_products['products_price'], tep_get_tax_rate($new_products['products_tax_class_id'])) . '</p>';
+      $new_prods_content .= '      <div class="text-center">';
+      $new_prods_content .= '        <div class="btn-group">';
+      $new_prods_content .= '          <a href="' . tep_href_link(FILENAME_PRODUCT_INFO, tep_get_all_get_params(array('action')) . 'products_id=' . $new_products['products_id']) . '" class="btn btn-primary" role="button">' . SMALL_IMAGE_BUTTON_VIEW . '</a>';
+      $new_prods_content .= '          <a href="' . tep_href_link($PHP_SELF, tep_get_all_get_params(array('action')) . 'action=buy_now&products_id=' . $new_products['products_id']) . '" class="btn btn-success" role="button">' . SMALL_IMAGE_BUTTON_BUY . '</a>';
+      $new_prods_content .= '        </div>';
+      $new_prods_content .= '      </div>';
+      $new_prods_content .= '    </div>';
+      $new_prods_content .= '  </div>';
+      $new_prods_content .= '</div>';
+   	}
+	
+?>
+
+  <h3><?php echo sprintf(TABLE_HEADING_NEW_PRODUCTS, strftime('%B')); ?></h3>
+
+  <div class="row">
+    <?php echo $new_prods_content; ?>
+  </div>
+  
+<?php
+if ($listing_split->number_of_rows > 0)  {
+  ?>
+  <div class="row">
+    <div class="col-sm-6 pagenumber hidden-xs">
+      <?php echo $listing_split->display_count(TEXT_DISPLAY_NUMBER_OF_PRODUCTS); ?>
+    </div>
+    <div class="col-sm-6">
+      <div class="pull-right pagenav"><ul class="pagination"><?php echo $listing_split->display_links(MAX_DISPLAY_PAGE_LINKS, tep_get_all_get_params(array('page', 'info', 'x', 'y'))); ?></ul></div>
+      <span class="pull-right"><?php echo TEXT_RESULT_PAGE; ?></span>
+    </div>
+  </div>
+    <?php
+  }
+  ?>
+
+<?php
+  }
+?>
