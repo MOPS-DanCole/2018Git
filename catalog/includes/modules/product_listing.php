@@ -182,6 +182,8 @@
 	  
       $prod_list_contents .= ' <small>' . substr($listing['short_desc'], 0, 200 . '<br>') . '&hellip;</small>'; 
 	  
+	 // $prod_list_contents .= ' <small>' . osc_trunc_string(strip_tags($listing['short_desc'], ''), 150) . '&hellip;</small>'; 
+	  
 	  //$prod_list_contents .= '      </div> <!--caption-->';
 	  
 	  if ($listing['products_weight'] > 0) {
