@@ -1580,4 +1580,63 @@
 
     return osc_split_mini_description($product['products_precis']);
   }
+// ################### Products Description Hack begins ##############
+//
+// grabs a length from a string, but goes back to the last space if it cut into
+// the middle of a string.  If the string is longer than that, cut, then add '...'
+// to the end of the string, if the $more == 1
+	function osc_trunc_string($str="",$len=150,$more=1)
+	{
+		if ($str=="") return $str;
+		if (is_array($str)) return $str;
+		$str = trim($str);
+		// if it's les than the size given, then return it
+		if (strlen($str) <= $len) return $str;
+		// else get that size of text
+		$str = substr($str,0,$len);
+		// backtrack to the end of a word
+		if ($str != "") {
+			// check to see if there are any spaces left
+			if (!substr_count($str," ")) {
+				if ($more) $str .= '...&nbsp;&nbsp;'/* . $lien;
+$lien = osc_suite_more($str)*/;
+				return $str;			}
+			// backtrack
+			while(strlen($str) && ($str[strlen($str)-1] != " ")) {
+				$str = substr($str,0,-1);
+			}
+			$str = substr($str,0,-1);
+			if ($more) $str .= ''/* . $lien*/;
+		}
+		return $str/* . '&nbsp;' . $lien*/;
+	}
+function osc_suite_more($str="",$len=150,$more=1)
+{	
+                                if ($str=="") return "";
+		if (is_array($str)) return "";
+		$str = trim($str);
+		// if it's les than the size given, then return it
+		if (strlen($str) <= $len) return "";
+		// else get that size of text
+		$str = substr($str,0,$len);
+		// backtrack to the end of a word
+		if ($str != "") {
+			// check to see if there are any spaces left
+			if (!substr_count($str," ")) {
+				if ($more) $str .= $lien;
+$lien = TEXT_PRODUCT_DESCRIPTION_MORE;
+				return $lien;			}
+}
+			// backtrack
+                                while(strlen($str) && ($str[strlen($str)-1] != " ")) {
+				$str = substr($str,0,-1);
+			}
+			$str = substr($str,0,-1);
+			if ($more) {
+                                                         $str .= $lien;
+$lien = TEXT_PRODUCT_DESCRIPTION_MORE;
+                                                         return $lien;
+                                                }
+	}
+// ########### Products Description Hack ends #############
 ?>

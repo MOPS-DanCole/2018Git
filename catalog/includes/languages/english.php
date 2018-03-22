@@ -385,3 +385,6 @@ define('ENTRY_DISCOUNT_COUPON_SHIPPING_CALC_ERROR', 'Your calculated shipping ch
 
 // testimonials contribution
 define('TEXT_DISPLAY_NUMBER_OF_TESTIMONIALS', 'Displaying <strong>%d</strong> to <strong>%d</strong> (of <strong>%d</strong> testimonials)');
+
+// product description more
+define('TEXT_PRODUCT_DESCRIPTION_MORE', '...read more.');

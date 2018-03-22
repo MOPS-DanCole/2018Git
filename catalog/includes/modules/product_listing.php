@@ -180,7 +180,11 @@
 	  
       $prod_list_contents .= '        </h2>';
 	  
-      $prod_list_contents .= ' <small>' . substr($listing['short_desc'], 0, 200 . '<br>') . '&hellip;</small>'; 
+      //$prod_list_contents .= ' <small>' . substr($listing['short_desc'], 0, 200 . '<br>') . '&hellip;</small>'; 
+	  
+	  //$prod_list_contents .= ' <small>' . osc_suite_more(strip_tags($listing['short_desc'], ''), 200) . '</small>'; 
+	  
+	  $prod_list_contents .= ' <small>' . osc_trunc_string(strip_tags($listing['short_desc'], ''), 200) . '<a href="' . tep_href_link(FILENAME_PRODUCT_INFO, 'products_id=' . $listing['products_id']) . '"><b>'. osc_suite_more(strip_tags($listing['short_desc'], ''), 200) . '</b></a></small>';
 	  
 	  //$prod_list_contents .= '      </div> <!--caption-->';
 	  
