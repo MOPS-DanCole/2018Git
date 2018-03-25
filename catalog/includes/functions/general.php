@@ -1598,7 +1598,7 @@
 		if ($str != "") {
 			// check to see if there are any spaces left
 			if (!substr_count($str," ")) {
-				if ($more) $str .= '...&nbsp;&nbsp;'/* . $lien;
+				if ($more) $str .= '&nbsp;&nbsp;'/* . $lien;
 $lien = osc_suite_more($str)*/;
 				return $str;			}
 			// backtrack
@@ -1606,7 +1606,7 @@ $lien = osc_suite_more($str)*/;
 				$str = substr($str,0,-1);
 			}
 			$str = substr($str,0,-1);
-			if ($more) $str .= ''/* . $lien*/;
+			if ($more) $str .= '&nbsp;&nbsp;'  /* . $lien*/;
 		}
 		return $str/* . '&nbsp;' . $lien*/;
 	}
