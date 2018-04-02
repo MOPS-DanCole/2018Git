@@ -1,2 +1,2 @@
 # 2018Git
-A new start
+We'll do a reset to see if we can stick with using GitHub to manage our osC projects.  Fingers crossed.
